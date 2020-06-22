@@ -13,7 +13,7 @@ log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 def run_prog_get_output(prog):
-	p = subprocess.Popen(prog, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	p = subprocess.Popen(prog, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
 	return p.stdout.readlines()
 
 def run_gsutil(list):
@@ -28,7 +28,7 @@ def run_gsutil(list):
 		size, source, dest = entry
 		log.debug("entry {}, {}, {}".format(size, source, dest))
 		recursive = False
-		if str(size).startswith("r"):
+		if size.startswith("r"):
 			size = size[1:]
 			recursive = True
 		paths = source.split('/')
@@ -93,6 +93,7 @@ if __name__ == '__main__':
 				
 				if opt.strip() == "-r":
 					s_list = run_prog_get_output("gsutil du -s " + source)
+					print(s_list)
 					size = int(s_list[0].rstrip().split()[0])
 					s_list_all.append(["r{}".format(size), source, dest])
 				else:
@@ -103,6 +104,7 @@ if __name__ == '__main__':
 				s_list = run_prog_get_output("gsutil du " + source)
 			
 				for s in s_list:
+					s = str(s)
 					s_list_all.append(s.rstrip().split() + [dest])
 	
 	run_gsutil(s_list_all)
