@@ -95,7 +95,6 @@ if __name__ == '__main__':
 				
 				if opt.strip() == "-r":
 					s_list = run_prog_get_output("gsutil du -s " + source)
-					print(s_list)
 					size = int(s_list[0].rstrip().split()[0])
 					s_list_all.append(["r{}".format(size), source, dest])
 				else:
@@ -104,9 +103,14 @@ if __name__ == '__main__':
 			else:
 				source, dest = entry
 				s_list = run_prog_get_output("gsutil du " + source)
-			
+				subdirs = []
 				for s in s_list:
-					s = str(s)
+					if s.strip().endswith('/'):
+						subdirs.append(s)
+				for s in s_list:
+					for d in subdirs:
+						if s.startswith(d):
+							continue
 					s_list_all.append(s.rstrip().split() + [dest])
 	
 	run_gsutil(s_list_all)
