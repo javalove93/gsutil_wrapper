@@ -113,7 +113,7 @@ if __name__ == '__main__':
 				subdirs = []
 				for s in s_list:
 					if s.strip().endswith('/'):
-						subdirs.append(s)
+						subdirs.append(s.split()[1].strip())
 				print(subdirs)
 				for s in s_list:
 					subdir = False
