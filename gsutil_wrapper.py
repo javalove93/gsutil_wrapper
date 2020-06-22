@@ -51,7 +51,7 @@ def run_gsutil(list):
 			print("aws s3 sync {} {} && gsutil mv {}/* {} && rmdir {}".format(source, temp_fn, temp_fn, dest, temp_fn))
 			p = subprocess.Popen("aws s3 sync {} {} && gsutil mv {}/* {} && rmdir {}".format(source, temp_fn, temp_fn, dest, temp_fn), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		else:
-			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, fn, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
 	for proc in processes:
@@ -73,6 +73,7 @@ if __name__ == '__main__':
 	s_list_all = []
 
 	for line in path_list:
+		line = line.rstrip()
 		log.debug(line)
 		if line.startswith('#'):
 			if line[1:].strip().startswith('MAX_TEMP_STORAGE'):
@@ -92,14 +93,8 @@ if __name__ == '__main__':
 					exit(1)
 				
 				if opt.strip() == "-r":
-					if not source.endswith('/'):
-						source = source + '/'
-					s_list = run_prog_get_output("gsutil du " + source + '*')
-					size = 0
-					for s in s_list:
-						log.debug(s)
-						size = size + int(s.rstrip().split()[0])
-
+					s_list = run_prog_get_output("gsutil du -s " + source)
+					size = int(s_list[0].rstrip().split()[0])
 					s_list_all.append(["r{}".format(size), source, dest])
 				else:
 					log.error("-r option is only allowed")
