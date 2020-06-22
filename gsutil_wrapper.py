@@ -55,12 +55,19 @@ def run_gsutil(list):
 			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest + fn), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
-	for proc in processes:
-		p, size, source = proc
-		p.wait()
-		temp_storage = temp_storage - int(size)
-		completed = completed + 1
-		log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
+
+	while len(processes) > 0:
+		new_processes = []
+		for proc in processes:
+			p, size, source = proc
+			if p.poll() == None:
+				new_processes.append([p, size, source])
+			else:
+				temp_storage = temp_storage - int(size)
+				completed = completed + 1
+				log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
+		processes = new_processes
+		time.sleep(0.1)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(prog='gsutil_wrapper', description='gsutil wrapper')
