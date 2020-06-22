@@ -4,5 +4,5 @@
 # s3://gcs-jerry/xa* gs://s3-to-gcs-jerry/
 # s3://gcs-jerry/xb* gs://s3-to-gcs-jerry/
 s3://gcs-jerry/testfolder/ gs://s3-to-gcs-jerry/testfolder -r
-s3://gcs-jerry/xa* gs://s3-to-gcs-jerry/
+# s3://gcs-jerry/xa* gs://s3-to-gcs-jerry/
 
