@@ -1,12 +1,13 @@
 import argparse
 import subprocess
 import logging
+import time
 
 opt_MAX_PROCESSES = 20
 opt_MAX_TEMP_STORAGE = 10
 log = logging.getLogger("gsutil_wrapper")
 handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
@@ -17,9 +18,29 @@ def run_prog_get_output(prog):
 def run_gsutil(list):
 	log.info("MAX_PROCESSES: {}".format(opt_MAX_PROCESSES))
 	log.info("MAX_TEMP_STORAGE: {}".format(opt_MAX_TEMP_STORAGE))
+	processes = []
+	temp_storage = 0
 	for entry in list:
 		size, source, dest = entry
-		print(size, source, dest)
+		log.debug("entry {}, {}, {}".format(size, source, dest))
+		paths = source.split('/')
+		fn = paths[len(paths) - 1]
+		p = subprocess.Popen("gsutil cp {source} . && gsutil mv {fn} {dest}".format(source, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		temp_storage = temp_storage + size
+		processes.append([p, size, source])
+		log.info("Started copying {source} to {dest}. {processes}/{storage}".format(source, dest, len(processes), temp_storage))
+		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= opt_MAX_TEMP_STORAGE:
+			new_processes = []
+			for proc in processes:
+				p, size, source = proc
+				if p.poll() != None:
+					new_processes.append([p, size, source])
+				else:
+					temp_storage = temp_storage - size
+					log.info("Completed copying {source}".format(source))
+			processes = new_processes
+			time.sleep(0.1)
+			
 
 
 if __name__ == '__main__':
