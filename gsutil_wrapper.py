@@ -2,6 +2,7 @@ import argparse
 import subprocess
 import logging
 import time
+import uuid
 
 opt_MAX_PROCESSES = 20
 opt_MAX_TEMP_STORAGE = 10
@@ -25,14 +26,16 @@ def run_gsutil(list):
 	completed = 0
 	for entry in list:
 		size, source, dest = entry
-		log.debug("entry {}, {}, {}".format(size, source, dest))
+#		log.debug("entry {}, {}, {}".format(size, source, dest))
+		recursive = False
+		if size.startswith("r"):
+			size = size[1:]
+			recursive = True
 		paths = source.split('/')
 		fn = paths[len(paths) - 1]
-		p = subprocess.Popen("gsutil cp {} . && gsutil mv {} {}".format(source, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		temp_fn = fn + '_' + uuid.uuid1()
 		temp_storage = temp_storage + int(size)
-		processes.append([p, size, source])
-		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
-		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
+		while len(processes)+1 >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
 			for proc in processes:
 				p, size, source = proc
@@ -44,6 +47,12 @@ def run_gsutil(list):
 					log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
 			processes = new_processes
 			time.sleep(0.1)
+		if recursive:
+			p = subprocess.Popen("aws sync {} {} && gsutil mv {}/* {} && rmdir {}".format(source, fn, fn, dest, fn), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		else:
+			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, fn, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+		processes.append([p, size, source])
+		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
 	for proc in processes:
 		p, size, source = proc
 		p.wait()
@@ -63,27 +72,40 @@ if __name__ == '__main__':
 	s_list_all = []
 
 	for line in path_list:
+		log.debug(line)
 		if line.startswith('#'):
-			opt, value = line[1:].strip().split()
-			if opt == 'MAX_TEMP_STORAGE':
+			if line[1:].strip().startswith('MAX_TEMP_STORAGE'):
+				opt, value = line[1:].strip().split()
 				opt_MAX_TEMP_STORAGE = int(value)
-			elif opt == 'MAX_PROCESSES':
+			elif line[1:].strip().startswith('MAX_PROCESSES'):
+				opt, value = line[1:].strip().split()
 				opt_MAX_PROCESSES = int(value)
 		elif line.strip() != "":
 			entry = line.rstrip().split()
 			opt = None
 			if len(entry) == 3:
 				source, dest, opt = entry
+				if source.find('*') >= 0 or source.find('?') >0:
+					log.error("Wildcard can't be used with -r option")
+					log.error(line)
+					exit(1)
+				
+				if opt.strip() == "-r":
+					s_list = run_prog_get_output("gsutil du " + source)
+					size = 0
+					for s in s_list:
+						size = size + int(s.rstrip().split()[0])
+
+					s_list_all.append(["r{}".format(size), source, dest])
+				else:
+					log.error("-r option is only allowed")
+					exit(1)
 			else:
 				source, dest = entry
-			log.debug(source)
-			log.debug(dest)
-			log.debug(opt)
-
-			s_list = run_prog_get_output("gsutil du " + source)
+				s_list = run_prog_get_output("gsutil du " + source)
 			
-			for s in s_list:
-				s_list_all.append(s.rstrip().split() + [dest])
+				for s in s_list:
+					s_list_all.append(s.rstrip().split() + [dest])
 	
 	run_gsutil(s_list_all)
 
