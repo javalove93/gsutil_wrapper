@@ -33,7 +33,7 @@ def run_gsutil(list):
 			recursive = True
 		paths = source.split('/')
 		fn = paths[len(paths) - 1]
-		temp_fn = fn + '_' + uuid.uuid1()
+		temp_fn = fn + '_' + str(uuid.uuid1())
 		temp_storage = temp_storage + int(size)
 		while len(processes)+1 >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
