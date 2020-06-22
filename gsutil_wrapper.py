@@ -41,8 +41,9 @@ def run_gsutil(list):
 					log.info("Completed copying {}".format(source))
 			processes = new_processes
 			time.sleep(0.1)
-			
-
+	for proc in processes:
+		p, size, source = proc
+		p.wait()
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(prog='gsutil_wrapper', description='gsutil wrapper')
