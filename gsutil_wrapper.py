@@ -69,7 +69,7 @@ if __name__ == '__main__':
 				opt_MAX_TEMP_STORAGE = int(value)
 			elif opt == 'MAX_PROCESSES':
 				opt_MAX_PROCESSES = int(value)
-		else:
+		elif line.strip() != "":
 			entry = line.rstrip().split()
 			opt = None
 			if len(entry) == 3:
