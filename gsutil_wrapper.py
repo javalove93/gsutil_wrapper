@@ -17,9 +17,10 @@ def run_prog_get_output(prog):
 
 def run_gsutil(list):
 	log.info("MAX_PROCESSES: {}".format(opt_MAX_PROCESSES))
-	log.info("MAX_TEMP_STORAGE: {}".format(opt_MAX_TEMP_STORAGE))
+	log.info("MAX_TEMP_STORAGE: {}GB".format(opt_MAX_TEMP_STORAGE))
 	processes = []
 	temp_storage = 0
+	max_temp_storage = opt_MAX_TEMP_STORAGE * 1024 * 1024 * 1024
 	for entry in list:
 		size, source, dest = entry
 		log.debug("entry {}, {}, {}".format(size, source, dest))
@@ -29,11 +30,11 @@ def run_gsutil(list):
 		temp_storage = temp_storage + int(size)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {}. {}/{}".format(source, dest, len(processes), temp_storage))
-		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= opt_MAX_TEMP_STORAGE:
+		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
 			for proc in processes:
 				p, size, source = proc
-				if p.poll() != None:
+				if p.poll() == None:
 					new_processes.append([p, size, source])
 				else:
 					temp_storage = temp_storage - int(size)
