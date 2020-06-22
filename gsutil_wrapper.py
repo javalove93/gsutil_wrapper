@@ -114,7 +114,6 @@ if __name__ == '__main__':
 				for s in s_list:
 					if s.strip().endswith('/'):
 						subdirs.append(s.split()[1].strip())
-				print(subdirs)
 				for s in s_list:
 					size, source = s.rstrip().split()
 					subdir = False
@@ -122,7 +121,6 @@ if __name__ == '__main__':
 						if source.startswith(d):
 							subdir = True
 					if not subdir:
-						print(s)
 						s_list_all.append([size, source, dest])
 	
 	run_gsutil(s_list_all)
