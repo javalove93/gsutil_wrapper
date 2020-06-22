@@ -5,7 +5,9 @@ import logging
 opt_MAX_PROCESSES = 20
 opt_MAX_TEMP_STORAGE = 10
 log = logging.getLogger("gsutil_wrapper")
-log.addHandler(logging.StreamHandler())
+handler = logging.StreamHandler()
+handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+log.addHandler(handler)
 log.setLevel(logging.DEBUG)
 
 def run_prog_get_output(prog):
