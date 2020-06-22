@@ -29,7 +29,7 @@ if __name__ == '__main__':
 		print(source)
 		print(dest)
 		print(opt)
-		result = run_prog_get_output("aws s3 ls " + source)
+		result = run_prog_get_output("gsutil ls -l " + source)
 		
 		print(result)
 
