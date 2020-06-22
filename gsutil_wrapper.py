@@ -48,14 +48,13 @@ def run_gsutil(list):
 			processes = new_processes
 			time.sleep(0.1)
 		if recursive:
-			p = subprocess.Popen("aws s3 sync {} {} && cd {} && gsutil -o 'GSUtil:parallel_process_count={}' -m mv . {} && cd .. && rmdir {}".format(source, temp_fn, temp_fn, opt_MAX_PROCESSES, dest, temp_fn), shell=True, stdout=None, stderr=None)
+			p = subprocess.Popen("aws s3 sync {} {} && cd {} && gsutil -o 'GSUtil:parallel_process_count={}' -m mv . {} && cd .. && rmdir {}".format(source, temp_fn, temp_fn, opt_MAX_PROCESSES, dest, temp_fn), shell=True, stdout=subprocess.DEVNULL, stderr=None)
 		else:
 			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest), shell=True, stdout=None, stderr=None)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
 	for proc in processes:
 		p, size, source = proc
-		print(p, size, source)
 		p.wait()
 		temp_storage = temp_storage - int(size)
 		completed = completed + 1
