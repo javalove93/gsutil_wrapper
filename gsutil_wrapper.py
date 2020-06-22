@@ -33,6 +33,8 @@ def run_gsutil(list):
 			recursive = True
 		paths = source.split('/')
 		fn = paths[len(paths) - 1]
+		if not dest.endswith('/'):
+			dest = dest + '/'
 		temp_fn = fn + '_' + str(uuid.uuid1())
 		temp_storage = temp_storage + int(size)
 		while len(processes)+1 >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
@@ -50,7 +52,7 @@ def run_gsutil(list):
 		if recursive:
 			p = subprocess.Popen("aws s3 sync {} {} && cd {} && gsutil -o 'GSUtil:parallel_process_count={}' -m mv . {} && cd .. && rmdir {}".format(source, temp_fn, temp_fn, opt_MAX_PROCESSES, dest, temp_fn), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 		else:
-			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest + fn), shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
 	for proc in processes:
