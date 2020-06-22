@@ -48,6 +48,7 @@ def run_gsutil(list):
 			processes = new_processes
 			time.sleep(0.1)
 		if recursive:
+			print("aws s3 sync {} {} && cd {} && gsutil -o 'GSUtil:parallel_process_count={}' -m mv . {} && rmdir {}".format(source, temp_fn, temp_fn, opt_MAX_PROCESSES, dest, temp_fn)
 			p = subprocess.Popen("aws s3 sync {} {} && cd {} && gsutil -o 'GSUtil:parallel_process_count={}' -m mv . {} && rmdir {}".format(source, temp_fn, temp_fn, opt_MAX_PROCESSES, dest, temp_fn), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		else:
 			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, temp_fn, temp_fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
