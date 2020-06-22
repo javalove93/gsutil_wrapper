@@ -26,7 +26,7 @@ def run_gsutil(list):
 		paths = source.split('/')
 		fn = paths[len(paths) - 1]
 		p = subprocess.Popen("gsutil cp {} . && gsutil mv {} {}".format(source, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-		temp_storage = temp_storage + size
+		temp_storage = temp_storage + int(size)
 		processes.append([p, size, source])
 		log.info("Started copying {} to {}. {}/{}".format(source, dest, len(processes), temp_storage))
 		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= opt_MAX_TEMP_STORAGE:
@@ -36,7 +36,7 @@ def run_gsutil(list):
 				if p.poll() != None:
 					new_processes.append([p, size, source])
 				else:
-					temp_storage = temp_storage - size
+					temp_storage = temp_storage - int(size)
 					log.info("Completed copying {}".format(source))
 			processes = new_processes
 			time.sleep(0.1)
