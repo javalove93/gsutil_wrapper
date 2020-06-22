@@ -26,7 +26,7 @@ def run_gsutil(list):
 	completed = 0
 	for entry in list:
 		size, source, dest = entry
-#		log.debug("entry {}, {}, {}".format(size, source, dest))
+		log.debug("entry {}, {}, {}".format(size, source, dest))
 		recursive = False
 		if size.startswith("r"):
 			size = size[1:]
