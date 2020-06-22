@@ -29,7 +29,7 @@ def run_gsutil(list):
 		p = subprocess.Popen("gsutil cp {} . && gsutil mv {} {}".format(source, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		temp_storage = temp_storage + int(size)
 		processes.append([p, size, source])
-		log.info("Started copying {} to {} - {}/{}GB".format(source, dest, len(processes), temp_storage/1024.0/1024/1024))
+		log.info("Started copying {} to {} - {}/{}GB".format(source, dest, len(processes), temp_storage/1024/1024/1024))
 		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
 			for proc in processes:
