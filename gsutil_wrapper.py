@@ -32,6 +32,7 @@ if __name__ == '__main__':
 		s_list = run_prog_get_output("gsutil du " + source)
 		
 		for s in s_list:
+			print(s.rstrip().split())
 			s_list_all.append(s.rstrip().split().append(dest))
 	
 	print(s_list_all)
