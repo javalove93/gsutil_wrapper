@@ -18,9 +18,11 @@ def run_prog_get_output(prog):
 def run_gsutil(list):
 	log.info("MAX_PROCESSES: {}".format(opt_MAX_PROCESSES))
 	log.info("MAX_TEMP_STORAGE: {}GB".format(opt_MAX_TEMP_STORAGE))
+	log.info("Total files {}".format(len(list)))
 	processes = []
 	temp_storage = 0
 	max_temp_storage = opt_MAX_TEMP_STORAGE * 1024 * 1024 * 1024
+	completed = 0
 	for entry in list:
 		size, source, dest = entry
 		log.debug("entry {}, {}, {}".format(size, source, dest))
@@ -29,7 +31,7 @@ def run_gsutil(list):
 		p = subprocess.Popen("gsutil cp {} . && gsutil mv {} {}".format(source, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		temp_storage = temp_storage + int(size)
 		processes.append([p, size, source])
-		log.info("Started copying {} to {} - {}/{}GB".format(source, dest, len(processes), temp_storage/1024/1024/1024))
+		log.info("Started copying {} to {} - {}/{} - {} procs {}GB".format(source, dest, completed, len(list), len(processes), temp_storage/1024/1024/1024))
 		while len(processes) >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
 			for proc in processes:
@@ -38,12 +40,16 @@ def run_gsutil(list):
 					new_processes.append([p, size, source])
 				else:
 					temp_storage = temp_storage - int(size)
-					log.info("Completed copying {}".format(source))
+					completed = completed + 1
+					log.info("Completed copying {} - {}/{}".format(source), completed, len(list))
 			processes = new_processes
 			time.sleep(0.1)
 	for proc in processes:
 		p, size, source = proc
 		p.wait()
+		temp_storage = temp_storage - int(size)
+		completed = completed + 1
+		log.info("Completed copying {} - {}/{}".format(source), completed, len(list))
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(prog='gsutil_wrapper', description='gsutil wrapper')
