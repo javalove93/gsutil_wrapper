@@ -115,10 +115,12 @@ if __name__ == '__main__':
 					if s.strip().endswith('/'):
 						subdirs.append(s)
 				for s in s_list:
+					subdir = False
 					for d in subdirs:
 						if s.startswith(d):
-							continue
-					s_list_all.append(s.rstrip().split() + [dest])
+							subdir = True
+					if not subdir:
+						s_list_all.append(s.rstrip().split() + [dest])
 	
 	run_gsutil(s_list_all)
 
