@@ -28,7 +28,7 @@ def run_gsutil(list):
 		size, source, dest = entry
 		log.debug("entry {}, {}, {}".format(size, source, dest))
 		recursive = False
-		if size.startswith("r"):
+		if str(size).startswith("r"):
 			size = size[1:]
 			recursive = True
 		paths = source.split('/')
