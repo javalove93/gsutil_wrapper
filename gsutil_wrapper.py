@@ -1,14 +1,19 @@
 import argparse
 import subprocess
+import logging
 
 opt_MAX_PROCESSES = 20
 opt_MAX_TEMP_STORAGE = 10
+log = logging.getLogger("gsutil_wrapper")
+log.setLevel(logging.DEBUG)
 
 def run_prog_get_output(prog):
 	p = subprocess.Popen(prog, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	return p.stdout.readlines()
 
 def run_gsutil(list):
+	log.info("MAX_PROCESSES: {}".format(opt_MAX_PROCESSES))
+	log.info("MAX_TEMP_STORAGE: {}".format(opt_MAX_TEMP_STORAGE))
 	for entry in list:
 		size, source, dest = entry
 		print(size, source, dest)
@@ -39,9 +44,9 @@ if __name__ == '__main__':
 				source, dest, opt = entry
 			else:
 				source, dest = entry
-			print(source)
-			print(dest)
-			print(opt)
+			log.debug(source)
+			log.debug(dest)
+			log.debug(opt)
 
 			s_list = run_prog_get_output("gsutil du " + source)
 			
