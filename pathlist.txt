@@ -1,2 +1,2 @@
-s3://gcs-jerry/xa* gs://s3-to-gcs-jerry/ -r
+s3://gcs-jerry/xa* gs://s3-to-gcs-jerry/
 s3://gcs-jerry/xb* gs://s3-to-gcs-jerry/

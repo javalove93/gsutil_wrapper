@@ -2,11 +2,8 @@ import argparse
 import subprocess
 
 def run_prog_get_output(prog):
-	print(prog)
 	p = subprocess.Popen(prog, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	for line in p.stdout.readlines():
-		print(line)
-	return "hello"
+	return p.stdout.readlines()
 
 
 
@@ -29,7 +26,8 @@ if __name__ == '__main__':
 		print(source)
 		print(dest)
 		print(opt)
-		result = run_prog_get_output("gsutil ls -l " + source)
+
+		s_list = run_prog_get_output("gsutil ls -l " + source)
 		
-		print(result)
+		print(s_list)
 
