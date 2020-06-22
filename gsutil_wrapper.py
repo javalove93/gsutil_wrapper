@@ -97,6 +97,7 @@ if __name__ == '__main__':
 					s_list = run_prog_get_output("gsutil du " + source)
 					size = 0
 					for s in s_list:
+						log.debug(s)
 						size = size + int(s.rstrip().split()[0])
 
 					s_list_all.append(["r{}".format(size), source, dest])
