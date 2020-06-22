@@ -92,6 +92,8 @@ if __name__ == '__main__':
 					exit(1)
 				
 				if opt.strip() == "-r":
+					if not source.endswith('/'):
+						source = source + '/'
 					s_list = run_prog_get_output("gsutil du " + source)
 					size = 0
 					for s in s_list:
