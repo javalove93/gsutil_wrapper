@@ -16,6 +16,8 @@ if __name__ == '__main__':
 	f_path_list = open(args.path_list)
 	path_list = f_path_list.readlines()
 
+	s_list_all = []
+
 	for line in path_list:
 		entry = line.rstrip().split()
 		opt = None
@@ -27,7 +29,10 @@ if __name__ == '__main__':
 		print(dest)
 		print(opt)
 
-		s_list = run_prog_get_output("gsutil ls -l " + source)
+		s_list = run_prog_get_output("gsutil du " + source)
 		
-		print(s_list)
+		for s in s_list:
+			s_list_all.append([s.rstrip(), dest])
+	
+	print(s_list_all)
 
