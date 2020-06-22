@@ -40,13 +40,13 @@ def run_gsutil(list):
 		while len(processes)+1 >= opt_MAX_PROCESSES or temp_storage >= max_temp_storage:
 			new_processes = []
 			for proc in processes:
-				p, size, source = proc
+				p, psize, psource = proc
 				if p.poll() == None:
-					new_processes.append([p, size, source])
+					new_processes.append([p, psize, psource])
 				else:
-					temp_storage = temp_storage - int(size)
+					temp_storage = temp_storage - int(psize)
 					completed = completed + 1
-					log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
+					log.info("Completed copying {} - {}/{}".format(psource, completed, len(list)))
 			processes = new_processes
 			time.sleep(0.1)
 		if recursive:
