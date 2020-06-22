@@ -48,6 +48,7 @@ def run_gsutil(list):
 			processes = new_processes
 			time.sleep(0.1)
 		if recursive:
+			print("aws sync {} {} && gsutil mv {}/* {} && rmdir {}".format(source, fn, fn, dest, fn))
 			p = subprocess.Popen("aws sync {} {} && gsutil mv {}/* {} && rmdir {}".format(source, fn, fn, dest, fn), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		else:
 			p = subprocess.Popen("gsutil cp {} {} && gsutil mv {} {}".format(source, fn, fn, dest), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
