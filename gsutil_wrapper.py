@@ -41,7 +41,7 @@ def run_gsutil(list):
 				else:
 					temp_storage = temp_storage - int(size)
 					completed = completed + 1
-					log.info("Completed copying {} - {}/{}".format(source), completed, len(list))
+					log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
 			processes = new_processes
 			time.sleep(0.1)
 	for proc in processes:
@@ -49,7 +49,7 @@ def run_gsutil(list):
 		p.wait()
 		temp_storage = temp_storage - int(size)
 		completed = completed + 1
-		log.info("Completed copying {} - {}/{}".format(source), completed, len(list))
+		log.info("Completed copying {} - {}/{}".format(source, completed, len(list)))
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(prog='gsutil_wrapper', description='gsutil wrapper')
