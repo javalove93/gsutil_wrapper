@@ -18,10 +18,13 @@ usage: gsutil_wrapper [-h] path_list
 
 <pre>
 # Options
+#
 # 최대로 병렬 실행할 gsutil 개수
 # MAX_PROCESSES 100
+#
 # 로컬 저장 공간(임시 파일 저장소로 사용할)의 크기 GB
 # MAX_TEMP_STORAGE 100
+#
 # 최대 병렬 실행 gsutil의 개수나 로컬 저장소가 꽉 찰 경우 대기 상태에 들어감
 #
 # Samples
